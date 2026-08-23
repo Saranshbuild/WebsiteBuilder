@@ -15,7 +15,7 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: "https://websitebuilder-1-75l0.onrender.com",
     credentials: true
 }));
 
