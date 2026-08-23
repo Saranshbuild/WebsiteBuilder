@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 
 import { useSelector } from "react-redux"
-import Navbar from "../components/navbar"
+import Navbar from "../components/navbar.jsx"
 
 const Home = () => {    
     const navigate = useNavigate()
