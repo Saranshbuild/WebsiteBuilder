@@ -154,64 +154,92 @@ ABSOLUTE RULES
 export const generateWebsite = async (req, res) => {
     try {
         const { prompt } = req.body;
+
         if (!prompt) {
-            return res.status(400).json({ message: "prompt is required" })
-        }
-        const user = await User.findById(req.user._id)
-        if (!user) {
-            return res.status(400).json({ message: "user not found" })
-        }
-        if (user.credits < 10) {
-            return res.status(400).json({ message: "Insufficient credits. buy more credits to generate" })
+            return res.status(400).json({
+                message: "prompt is required"
+            });
         }
 
-        const finalPrompt = masterPrompt.replace("USER_PROMPT", prompt)
-        let raw = ""
-        let parsed = null
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(400).json({
+                message: "user not found"
+            });
+        }
+
+        if (user.credits < 10) {
+            return res.status(400).json({
+                message: "Insufficient credits. buy more credits to generate"
+            });
+        }
+
+        const finalPrompt = masterPrompt.replace("USER_PROMPT", prompt);
+
+        let raw = "";
+        let parsed = null;
+
         for (let i = 0; i < 2 && !parsed; i++) {
-            raw = await generateResponse(finalPrompt)
-            parsed = await extractJson(raw)
+            raw = await generateResponse(finalPrompt);
+            parsed = await extractJson(raw);
+
             if (!parsed) {
-                raw = await generateResponse(finalPrompt + `\n\nReturn only raw json only.`)
-                parsed = await extractJson(raw)
+                raw = await generateResponse(
+                    finalPrompt + `\n\nReturn only raw json only.`
+                );
+
+                parsed = await extractJson(raw);
             }
         }
-        if (!parsed.code) {
-            return res.status(400).json({ message: "AI returned invalid response" })
 
+        // IMPORTANT: check parsed first
+        if (!parsed || !parsed.code) {
+            return res.status(400).json({
+                message: "AI returned invalid response"
+            });
         }
+
+        // Generate a unique slug
+        const slug = `${prompt
+            .slice(0, 40)
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "")}-${Date.now()}`;
 
         const website = await Website.create({
             user: user._id,
             title: prompt.slice(0, 60),
+            slug: slug,
             latestCode: parsed.code,
             conversation: [
                 {
                     role: "user",
                     content: prompt
                 },
-                { role: "ai", content: parsed.message }
+                {
+                    role: "ai",
+                    content: parsed.message
+                }
             ]
-        }
-        )
-        user.credits = user.credits - 10
-        await user.save()
+        });
+
+        user.credits = user.credits - 10;
+        await user.save();
 
         return res.status(201).json({
             websiteId: website._id,
-            remainingCredits: user.credits,
-
-        })
-
-
-
-
+            remainingCredits: user.credits
+        });
 
     } catch (error) {
         console.error("GENERATE WEBSITE ERROR:", error);
-        return res.status(500).json({ message: error.message })
+
+        return res.status(500).json({
+            message: error.message
+        });
     }
-}
+};
 
 export const getAllWebsite = async (req, res) => {
     try {
