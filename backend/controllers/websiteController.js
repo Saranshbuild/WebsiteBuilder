@@ -311,7 +311,7 @@ export const changewebsite = async (req, res) => {
             raw = await generateResponse(updatePrompt)
             parsed = await extractJson(raw)
             if (!parsed) {
-                raw = await generateResponse(finalPrompt + `\n\nReturn only raw json only.`)
+                raw = await generateResponse(updatePrompt + `\n\nReturn only raw json only.`)
                 parsed = await extractJson(raw)
             }
         }
