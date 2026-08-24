@@ -333,7 +333,7 @@ export const changewebsite = async (req, res) => {
         await website.save()
         user.credits = user.credits -5
         await user.save()
-        return res.status(200),json({
+        return res.status(200).json({
             message:parsed.message,
             code:parsed.code,
             remainingCredits:user.credits,
