@@ -315,7 +315,7 @@ export const changewebsite = async (req, res) => {
                 parsed = await extractJson(raw)
             }
         }
-        if (!parsed.code) {
+        if (!parsed || !parsed.code) {
             return res.status(400).json({ message: "AI returned invalid response" })
 
         }
