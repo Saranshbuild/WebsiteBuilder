@@ -340,8 +340,11 @@ export const changewebsite = async (req, res) => {
             
         })
 }
-    catch (error) {
-    return res.status(500).json({ message: error.message })
+  catch (error) {
+    console.error("CHANGE WEBSITE ERROR:", error)
+    return res.status(500).json({
+        message: error.message
+    })
 }
 }
 
