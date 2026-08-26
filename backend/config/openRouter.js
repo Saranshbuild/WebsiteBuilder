@@ -9,7 +9,7 @@ export const generateResponse = async (prompt) => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                   model: "qwen/qwen3-coder:free",
+                   model: "openrouter/free",
                     messages: [
                         {
                             role: "system",
